@@ -24,6 +24,7 @@ namespace Lab5Games.VersionBuilder.Editor
         [MenuItem("Lab5Games/Create Version File")]
         private static void CreateVersionFile()
         {
+
             string url = GetFileLocation();
 
             if (File.Exists(url))
@@ -47,28 +48,34 @@ namespace Lab5Games.VersionBuilder.Editor
             PlayerSettings.bundleVersion = appVersion.GetVersionCode();
 
             AssetDatabase.Refresh();
+
         }
 
         public void OnPreprocessBuild(BuildReport report)
         {
-            if (!CheckFileExists())
+            if (EditorUtility.DisplayDialog("Version Builder", "Do you want use Version Builder ?", "Yes", "No"))
             {
-                throw new Exception("BuildVersionProcess: Missing version file, create one from Unity top bar 'Lab5Games/Create Version File'");
+                if (!CheckFileExists())
+                {
+                    throw new Exception("BuildVersionProcess: Missing version file, create one from Unity top bar 'Lab5Games/Create Version File'");
+                }
+
+                string json = File.ReadAllText(GetFileLocation());
+
+                AppVersion appVersion = new AppVersion(0, 0, 0, "ERROR");
+                EditorJsonUtility.FromJsonOverwrite(json, appVersion);
+
+                // increased build number
+                ++appVersion.build;
+                appVersion.date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+
+                SetupPlayerSettings(appVersion);
+
+                // override version file
+                File.WriteAllText(GetFileLocation(), EditorJsonUtility.ToJson(appVersion));
+
+                AssetDatabase.Refresh();
             }
-
-            string json = File.ReadAllText(GetFileLocation());
-
-            AppVersion appVersion = new AppVersion(0, 0, 0, "ERROR");
-            EditorJsonUtility.FromJsonOverwrite(json, appVersion);
-
-            // increased build number
-            ++appVersion.build;
-            appVersion.date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-
-            SetupPlayerSettings(appVersion);
-
-            // override version file
-            File.WriteAllText(GetFileLocation(), EditorJsonUtility.ToJson(appVersion));
         }
 
         private static void SetupPlayerSettings(AppVersion version)
@@ -77,7 +84,7 @@ namespace Lab5Games.VersionBuilder.Editor
 
             PlayerSettings.bundleVersion = version.GetVersionCode();
 
-            switch(EditorUserBuildSettings.activeBuildTarget)
+            switch (EditorUserBuildSettings.activeBuildTarget)
             {
                 case BuildTarget.iOS:
                     PlayerSettings.iOS.buildNumber = version.build.ToString();
