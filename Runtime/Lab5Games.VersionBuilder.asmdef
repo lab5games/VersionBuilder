@@ -1,6 +1,6 @@
 {
     "name": "Lab5Games.VersionBuilder",
-    "rootNamespace": "Lab5Games.VersionBuilder",
+    "rootNamespace": "Lab5Games",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],

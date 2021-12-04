@@ -1,6 +1,6 @@
 {
     "name": "Lab5Games.VersionBuilder.Editor",
-    "rootNamespace": "Lab5Games.VersionBuilder.Editor",
+    "rootNamespace": "Lab5Games.Editor",
     "references": [
         "GUID:0ad8d3c26a634954e9f6725cb9d45603"
     ],
